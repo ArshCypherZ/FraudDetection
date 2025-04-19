@@ -1,0 +1,13 @@
+# Development and Model Training Dependencies
+pandas==2.2.3
+scikit-learn==1.6.1
+skl2onnx==1.18.0
+jupyter==1.1.1
+kaggle==1.7.4.2 # Optional: For downloading datasets
+
+# Linting and Formatting
+flake8==7.1.0
+black==24.4.2
+
+# Include runtime dependencies as well for a complete dev environment
+-r requirements.txt
