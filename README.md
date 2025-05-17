@@ -85,6 +85,7 @@ pip install -r requirements-dev.txt
 # --- .env file content ---
 # REDIS_HOST=localhost
 # REDIS_PORT=6379
+# REDIS_PASSWORD = 
 # MYSQL_HOST=localhost
 # MYSQL_USER=your_mysql_user         # REQUIRED - No default value
 # MYSQL_PASSWORD=your_mysql_password # REQUIRED - No default value
