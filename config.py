@@ -7,6 +7,7 @@ load_dotenv()
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 REDIS_DB = int(os.getenv("REDIS_DB", 0))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
 REDIS_TRANSACTION_QUEUE = "transaction_queue"
 REDIS_HIGH_RISK_IPS_SET = "high_risk_ips"
 
@@ -50,6 +51,7 @@ def get_redis_connection_config():
     return {
         "host": REDIS_HOST,
         "port": REDIS_PORT,
+        "password": REDIS_PASSWORD,
         "db": REDIS_DB,
         "decode_responses": True,  # Decode responses to strings
     }
