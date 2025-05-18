@@ -1,9 +1,9 @@
 import redis
 import logging
+import os
 from datetime import datetime, timedelta
 import redis
 import logging
-from datetime import datetime, timedelta
 
 import config
 
@@ -115,27 +115,35 @@ def check_high_frequency(
         return False  # Fail safe
 
 
-def check_suspicious_description(description: str | None) -> bool:
-    """Checks transaction description for suspicious patterns using Rabin-Karp."""
+def check_suspicious_description(description: str) -> bool:
+    """
+    Checks if the transaction description contains suspicious keywords.
+    Uses Rabin-Karp string matching for efficiency.
+    """
     if not description:
         return False
 
-    # suspicious patterns
-    suspicious_patterns = [
-        "urgent payment required",
-        "account verification",
-        "claim prize",
-        "transfer funds immediately",
-        "suspicious login attempt",
-    ]
-    text_lower = description.lower()
+    # Normalize description text for matching
+    desc_lower = description.lower()
 
-    for pattern in suspicious_patterns:
-        if search_rabin_karp(pattern.lower(), text_lower):
-            logger.warning(
-                f"Rule Triggered: Suspicious pattern '{pattern}' in description."
-            )
+    # Get suspicious keywords from file
+    keywords = []
+    try:
+        keywords_file = os.path.join(os.path.dirname(__file__), "suspicious_keywords.txt")
+        if os.path.exists(keywords_file):
+            with open(keywords_file, "r") as f:
+                keywords = [line.strip().lower() for line in f if line.strip()]
+    except Exception as e:
+        logger.error(f"Error loading suspicious keywords: {e}")
+        # Fallback to a short list of common suspicious terms
+        keywords = ["bitcoin", "urgent", "money transfer", "gift card", "lottery"]
+
+    # Check for suspicious keywords using Rabin-Karp
+    for keyword in keywords:
+        if search_rabin_karp(keyword, desc_lower):
+            logger.warning(f"Rule Triggered: Suspicious description (keyword: {keyword})")
             return True
+
     return False
 
 

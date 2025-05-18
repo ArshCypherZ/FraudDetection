@@ -1,0 +1,1148 @@
+<!-- filepath: /home/arsh/Desktop/FraudDetection/frontend/frontend.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fraud Detection System</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#3b82f6',secondary:'#ef4444'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+input[type="number"] {
+-moz-appearance: textfield;
+}
+</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<div class="container mx-auto px-4 py-8">
+<header class="text-center mb-8">
+<h1 class="text-3xl font-bold text-gray-800 mb-2">Fraud Detection System</h1>
+<p class="text-gray-600">Advanced transaction analysis and fraud prevention</p>
+</header>
+
+<!-- Authentication UI Container - Hidden initially if not logged in -->
+<div id="authContainer" class="w-full max-w-md mx-auto mb-8">
+    <div id="loginForm" class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Login</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-gray-700 mb-2" for="username">Username</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                        <i class="ri-user-line"></i>
+                    </div>
+                    <input type="text" id="loginUsername" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary" placeholder="Enter username">
+                </div>
+            </div>
+            <div>
+                <label class="block text-gray-700 mb-2" for="password">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                        <i class="ri-lock-line"></i>
+                    </div>
+                    <input type="password" id="loginPassword" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary" placeholder="Enter password">
+                </div>
+            </div>
+            <button id="loginButton" class="w-full bg-primary hover:bg-blue-600 text-white py-2 px-4 rounded-button">Login</button>
+            <div class="text-center">
+                <button id="showRegisterBtn" class="text-primary hover:text-blue-600">Don't have an account? Register</button>
+            </div>
+        </div>
+        <div id="loginError" class="mt-4 text-red-500 hidden"></div>
+    </div>
+
+    <div id="registerForm" class="bg-white rounded-lg shadow-md p-6 hidden">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Create Account</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-gray-700 mb-2" for="registerUsername">Username</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                        <i class="ri-user-line"></i>
+                    </div>
+                    <input type="text" id="registerUsername" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary" placeholder="Choose username">
+                </div>
+            </div>
+            <div>
+                <label class="block text-gray-700 mb-2" for="registerPassword">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                        <i class="ri-lock-line"></i>
+                    </div>
+                    <input type="password" id="registerPassword" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary" placeholder="Choose password">
+                </div>
+            </div>
+            <div>
+                <label class="block text-gray-700 mb-2" for="registerEmail">Email (optional)</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                        <i class="ri-mail-line"></i>
+                    </div>
+                    <input type="email" id="registerEmail" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary" placeholder="Enter email">
+                </div>
+            </div>
+            <button id="registerButton" class="w-full bg-primary hover:bg-blue-600 text-white py-2 px-4 rounded-button">Register</button>
+            <div class="text-center">
+                <button id="showLoginBtn" class="text-primary hover:text-blue-600">Already have an account? Login</button>
+            </div>
+        </div>
+        <div id="registerError" class="mt-4 text-red-500 hidden"></div>
+    </div>
+</div>
+
+<!-- User Profile Bar - Hidden initially, shown after login -->
+<div id="userProfileBar" class="bg-white rounded-lg shadow-md p-4 mb-6 hidden">
+    <div class="flex justify-between items-center">
+        <div class="flex items-center">
+            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white">
+                <i class="ri-user-line ri-lg"></i>
+            </div>
+            <div class="ml-3">
+                <div class="text-gray-800 font-medium" id="profileUsername">Username</div>
+                <div class="text-gray-500 text-sm" id="profileUserId">User ID</div>
+            </div>
+        </div>
+        <button id="logoutButton" class="bg-red-100 text-red-500 hover:bg-red-200 py-1 px-3 rounded-full text-sm flex items-center">
+            <i class="ri-logout-box-line mr-1"></i> Logout
+        </button>
+    </div>
+</div>
+
+<!-- Main Dashboard Content - Hidden initially until login -->
+<div id="mainDashboard" class="hidden">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+<!-- Total Transactions Card -->
+<div class="bg-primary rounded p-6 text-white shadow-lg">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-xl font-semibold">Total Transactions</h2>
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-line-chart-line ri-lg"></i>
+</div>
+</div>
+<div id="totalTransactions" class="text-4xl font-bold mb-2">Loading...</div>
+<p class="text-blue-100">All-time transaction checks</p>
+</div>
+<!-- Frauds Detected Card -->
+<div class="bg-red-500 rounded p-6 text-white shadow-lg">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-xl font-semibold">Frauds Detected</h2>
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-shield-flash-line ri-lg"></i>
+</div>
+</div>
+<div id="fraudsDetected" class="text-4xl font-bold mb-2">Loading...</div>
+<p class="text-red-100">Potential fraud prevented</p>
+</div>
+<!-- Success Rate Card -->
+<div class="bg-green-500 rounded p-6 text-white shadow-lg">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-xl font-semibold">Success Rate</h2>
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-check-line ri-lg"></i>
+</div>
+</div>
+<div id="successRate" class="text-4xl font-bold mb-2">Loading...</div>
+<p class="text-green-100">Safe transactions rate</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Transaction Analyzer -->
+<div class="bg-white rounded shadow-md p-6">
+<h2 class="text-xl font-bold text-gray-800 mb-6">Transaction Analyzer</h2>
+<div class="grid grid-cols-1 gap-4 mb-4">
+<div>
+<label class="block text-gray-700 mb-2">Amount</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+<i class="ri-money-dollar-circle-line"></i>
+</div>
+<input type="number" id="transactionAmount" placeholder="0.00" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary">
+</div>
+</div>
+</div>
+<div class="mb-6">
+<label class="block text-gray-700 mb-2">Description</label>
+<div class="relative">
+<div class="absolute top-3 left-3 flex items-start pointer-events-none text-gray-500">
+<i class="ri-file-list-line"></i>
+</div>
+<textarea id="transactionDescription" placeholder="Enter transaction details" rows="4" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary"></textarea>
+</div>
+</div>
+<button id="checkFraudBtn" class="w-full bg-primary hover:bg-blue-600 text-white py-3 rounded-button flex items-center justify-center whitespace-nowrap">
+<i class="ri-search-line mr-2"></i> Check for Fraud
+</button>
+
+<!-- Location Permission Dialog -->
+<div id="locationDialog" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+<div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+<div class="text-center">
+<div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+<i class="ri-map-pin-line text-primary ri-2x"></i>
+</div>
+<h3 class="text-xl font-bold text-gray-800 mb-2">Location Access Required</h3>
+<p class="text-gray-600 mb-6">To ensure secure transaction verification, we need access to your current location. This helps us protect against fraudulent activities.</p>
+<div class="flex space-x-3 justify-center">
+<button id="denyLocation" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white hover:bg-gray-50 whitespace-nowrap">Deny</button>
+<button id="allowLocation" class="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-button whitespace-nowrap">Allow Access</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent History -->
+<div class="bg-white rounded shadow-md p-6">
+<h2 class="text-xl font-bold text-gray-800 mb-6">Recent History</h2>
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead>
+<tr class="border-b border-gray-200">
+<th class="text-left py-3 px-2 text-gray-600 font-medium">TRANSACTION ID</th>
+<th class="text-left py-3 px-2 text-gray-600 font-medium">AMOUNT</th>
+<th class="text-left py-3 px-2 text-gray-600 font-medium">STATUS</th>
+<th class="text-left py-3 px-2 text-gray-600 font-medium">TIMESTAMP</th>
+</tr>
+</thead>
+<tbody id="transactionsTableBody">
+<!-- Transaction data will be loaded dynamically -->
+<tr class="border-b border-gray-100">
+<td class="py-3 px-2 text-gray-800" colspan="4">Loading transaction history...</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+<button id="exportBtn" class="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white hover:bg-gray-50 whitespace-nowrap">
+<i class="ri-download-line mr-2"></i> Export Data
+</button>
+<!-- Export Dialog -->
+<div id="exportDialog" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+<div class="bg-white rounded-lg p-6 w-full max-w-xl">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold text-gray-800">Export Transaction Data</h3>
+<button id="closeExportDialog" class="text-gray-500 hover:text-gray-700">
+<i class="ri-close-line ri-lg"></i>
+</button>
+</div>
+<div class="space-y-4">
+<!-- Format Selection -->
+<div>
+<label class="block text-gray-700 mb-2">Export Format</label>
+<div class="flex space-x-3">
+<label class="flex items-center">
+<input type="radio" name="format" value="csv" checked class="hidden">
+<div class="w-4 h-4 border border-gray-300 rounded-full flex items-center justify-center mr-2">
+<div class="w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span>CSV</span>
+</label>
+<label class="flex items-center">
+<input type="radio" name="format" value="excel" class="hidden">
+<div class="w-4 h-4 border border-gray-300 rounded-full flex items-center justify-center mr-2">
+<div class="w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span>Excel</span>
+</label>
+<label class="flex items-center">
+<input type="radio" name="format" value="pdf" class="hidden">
+<div class="w-4 h-4 border border-gray-300 rounded-full flex items-center justify-center mr-2">
+<div class="w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span>PDF</span>
+</label>
+</div>
+</div>
+<!-- Date Range -->
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-gray-700 mb-2">Start Date</label>
+<input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary">
+</div>
+<div>
+<label class="block text-gray-700 mb-2">End Date</label>
+<input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary">
+</div>
+</div>
+<!-- Status Filter -->
+<div>
+<label class="block text-gray-700 mb-2">Transaction Status</label>
+<select id="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary pr-8">
+<option value="all">All Transactions</option>
+<option value="safe">Safe Only</option>
+<option value="fraudulent">Fraudulent Only</option>
+</select>
+</div>
+<!-- Preview -->
+<div>
+<label class="block text-gray-700 mb-2">Data Preview</label>
+<div class="border border-gray-200 rounded p-3 bg-gray-50 h-32 overflow-y-auto">
+<table class="w-full text-sm">
+<thead>
+<tr class="border-b border-gray-200">
+<th class="text-left py-2 px-2 text-gray-600">ID</th>
+<th class="text-left py-2 px-2 text-gray-600">Amount</th>
+<th class="text-left py-2 px-2 text-gray-600">Status</th>
+<th class="text-left py-2 px-2 text-gray-600">Date</th>
+</tr>
+</thead>
+<tbody id="previewData">
+<!-- Preview data will be populated here -->
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="flex justify-end space-x-3 mt-6">
+<button id="cancelExport" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white hover:bg-gray-50 whitespace-nowrap">Cancel</button>
+<button id="confirmExport" class="px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-button whitespace-nowrap">Export</button>
+</div>
+</div>
+</div>
+<div class="flex space-x-2">
+<button class="filter-btn px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white hover:bg-gray-50 whitespace-nowrap" data-filter="all">All</button>
+<button class="filter-btn px-4 py-2 border border-red-300 rounded-button text-red-700 bg-red-50 hover:bg-red-100 whitespace-nowrap" data-filter="Fraudulent">Fraudulent</button>
+<button class="filter-btn px-4 py-2 border border-green-300 rounded-button text-green-700 bg-green-50 hover:bg-green-100 whitespace-nowrap" data-filter="Safe">Safe</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Risk Analysis Chart -->
+<div class="mt-8 bg-white rounded shadow-md p-6">
+<h2 class="text-xl font-bold text-gray-800 mb-6">Risk Analysis</h2>
+<div id="riskChart" style="width: 100%; height: 400px;"></div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script>
+// API base URL - change this to match your backend API deployment
+const API_BASE_URL = 'http://localhost:8000';
+
+document.addEventListener('DOMContentLoaded', function() {
+// Initialize the application
+initializeApp();
+
+// Elements
+const locationDialog = document.getElementById('locationDialog');
+const allowLocationBtn = document.getElementById('allowLocation');
+const denyLocationBtn = document.getElementById('denyLocation');
+const checkFraudBtn = document.getElementById('checkFraudBtn');
+const transactionAmount = document.getElementById('transactionAmount');
+const transactionDescription = document.getElementById('transactionDescription');
+const exportBtn = document.getElementById('exportBtn');
+const exportDialog = document.getElementById('exportDialog');
+const closeExportDialog = document.getElementById('closeExportDialog');
+const cancelExport = document.getElementById('cancelExport');
+const confirmExport = document.getElementById('confirmExport');
+const startDate = document.getElementById('startDate');
+const endDate = document.getElementById('endDate');
+const statusFilter = document.getElementById('statusFilter');
+const previewData = document.getElementById('previewData');
+const filterButtons = document.querySelectorAll('.filter-btn');
+
+// Initialize date inputs for export dialog
+const today = new Date();
+const lastMonth = new Date(today);
+lastMonth.setMonth(lastMonth.getMonth() - 1);
+startDate.value = lastMonth.toISOString().split('T')[0];
+endDate.value = today.toISOString().split('T')[0];
+
+// Helper Functions
+function generateTransactionId() {
+  return 'TX' + Math.random().toString(36).substr(2, 8).toUpperCase();
+}
+
+async function getIPAddress() {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    console.error('Error getting IP address:', error);
+    return 'Unable to fetch IP';
+  }
+}
+
+function getCurrentTimestamp() {
+  const now = new Date();
+  return now.toISOString().slice(0, 19).replace('T', ' ');
+}
+
+async function getLocationInfo(position) {
+  const { latitude, longitude } = position.coords;
+  try {
+    const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+    const data = await response.json();
+    return `${data.city}, ${data.countryName}`;
+  } catch (error) {
+    console.error('Error getting location info:', error);
+    return 'Location unavailable';
+  }
+}
+
+function showLocationDialog() {
+  locationDialog.classList.remove('hidden');
+}
+
+function hideLocationDialog() {
+  locationDialog.classList.add('hidden');
+}
+
+function showNotification(message, type = 'success') {
+  const notification = document.createElement('div');
+  notification.className = `fixed bottom-4 right-4 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded shadow-lg`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+// Add these new helper functions for caching transactions
+function saveTransactionsToCache(transactions) {
+  try {
+    localStorage.setItem('cachedTransactions', JSON.stringify(transactions));
+    localStorage.setItem('transactionsCacheTime', new Date().getTime().toString());
+  } catch (error) {
+    console.error('Error saving transactions to cache:', error);
+  }
+}
+
+function loadTransactionsFromCache() {
+  try {
+    const cachedTransactions = localStorage.getItem('cachedTransactions');
+    return cachedTransactions ? JSON.parse(cachedTransactions) : [];
+  } catch (error) {
+    console.error('Error loading transactions from cache:', error);
+    return [];
+  }
+}
+
+// API Functions
+async function fetchDashboardStatistics() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/statistics`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    
+    // Update dashboard cards
+    document.getElementById('totalTransactions').textContent = data.total_transactions.toLocaleString();
+    document.getElementById('fraudsDetected').textContent = data.frauds_detected.toLocaleString();
+    document.getElementById('successRate').textContent = data.success_rate.toFixed(1) + '%';
+    
+  } catch (error) {
+    console.error('Error fetching statistics:', error);
+    showNotification('Unable to load dashboard statistics', 'error');
+  }
+}
+
+
+async function fetchRiskAnalysisData() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/risk-analysis`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    
+    renderRiskChart(data);
+  } catch (error) {
+    console.error('Error fetching risk analysis data:', error);
+    showNotification('Unable to load risk analysis data', 'error');
+  }
+}
+
+async function checkTransaction(transactionData) {
+  try {
+    const response = await fetchWithAuth(`${API_BASE_URL}/check-transaction`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(transactionData)
+    });
+    
+    console.log("Transaction check response:", await response.clone().json());
+    
+    if (!response.ok) {
+      throw new Error(`Error checking transaction: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking transaction:', error);
+    throw error;
+  }
+}
+
+async function exportTransactions(exportData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/export`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(exportData)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
+    // For CSV format, trigger download
+    if (exportData.format === 'csv') {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } else {
+      const result = await response.json();
+      showNotification(result.message);
+    }
+  } catch (error) {
+    console.error('Error exporting transactions:', error);
+    showNotification('Unable to export transactions', 'error');
+  }
+}
+
+// UI Update Functions
+function updateTransactionsTable(transactions) {
+  try {
+    console.log('Updating transactions table with:', transactions);
+    // Update the table...
+    const tbody = document.getElementById('transactionsTableBody');
+    
+    if (!transactions || transactions.length === 0) {
+      console.log('No transactions to display');
+      tbody.innerHTML = `
+        <tr class="border-b border-gray-100">
+          <td class="py-3 px-2 text-gray-800" colspan="4">No transactions found</td>
+        </tr>
+      `;
+      return;
+    }
+    
+    tbody.innerHTML = transactions.map(tx => `
+      <tr class="border-b border-gray-100">
+        <td class="py-3 px-2 text-gray-800">${tx.transaction_id}</td>
+        <td class="py-3 px-2 text-gray-800">$${tx.amount.toFixed(2)}</td>
+        <td class="py-3 px-2">
+          <span class="bg-${tx.status === 'Safe' ? 'green' : 'red'}-100 text-${tx.status === 'Safe' ? 'green' : 'red'}-800 text-xs font-medium px-2.5 py-0.5 rounded">${tx.status}</span>
+        </td>
+        <td class="py-3 px-2 text-gray-600">${tx.timestamp}</td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Error updating transactions table:', error);
+    showNotification('Failed to update transaction table', 'error');
+  }
+}
+
+function renderRiskChart(data) {
+  const chartDom = document.getElementById('riskChart');
+  const myChart = echarts.init(chartDom);
+  
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    legend: {
+      data: ['Transactions', 'Fraud Attempts', 'Risk Score (%)']
+    },
+    xAxis: {
+      type: 'category',
+      data: data.dates
+    },
+    yAxis: [
+      {
+        type: 'value',
+        name: 'Count',
+        position: 'left'
+      },
+      {
+        type: 'value',
+        name: 'Score (%)',
+        position: 'right',
+        max: 100,
+        min: 0
+      }
+    ],
+    series: [
+      {
+        name: 'Transactions',
+        type: 'bar',
+        data: data.transactions
+      },
+      {
+        name: 'Fraud Attempts',
+        type: 'bar',
+        data: data.fraud_attempts
+      },
+      {
+        name: 'Risk Score (%)',
+        type: 'line',
+        yAxisIndex: 1,
+        data: data.risk_scores
+      }
+    ]
+  };
+  
+  myChart.setOption(option);
+  
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    myChart.resize();
+  });
+}
+
+// Event handlers
+checkFraudBtn.addEventListener('click', function() {
+  const amount = transactionAmount.value;
+  if (!amount) {
+    showNotification('Please enter transaction amount', 'error');
+    return;
+  }
+  showLocationDialog();
+});
+
+allowLocationBtn.addEventListener('click', function() {
+  hideLocationDialog();
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const location = await getLocationInfo(position);
+      const ipAddress = await getIPAddress();
+      
+      try {
+        // Show analysis in progress
+        showNotification('Analyzing transaction...', 'success');
+        
+        // Collect transaction data
+        const transactionData = {
+          amount: parseFloat(transactionAmount.value),
+          description: transactionDescription.value || 'No description',
+          location: location,
+          ip_address: ipAddress
+        };
+        
+        console.log("Sending transaction data:", JSON.stringify(transactionData));
+        
+        // Call backend to check transaction
+        const result = await checkTransaction(transactionData);
+        
+        // Add to recent history 
+        const tbody = document.getElementById('transactionsTableBody');
+        const newRow = document.createElement('tr');
+        newRow.className = 'border-b border-gray-100';
+        
+        // Create detailed tooltip content for the transaction status
+        let tooltipContent = '';
+        if (result.triggered_rules && result.triggered_rules.length > 0) {
+          tooltipContent += `Triggered rules: ${result.triggered_rules.join(', ')}<br>`;
+        }
+        tooltipContent += `Risk score: ${result.risk_score}%<br>`;
+        tooltipContent += `ML confidence: ${(result.ml_score * 100).toFixed(1)}%`;
+        
+        // Create row with tooltip
+        newRow.innerHTML = `
+          <td class="py-3 px-2 text-gray-800">${result.transaction_id}</td>
+          <td class="py-3 px-2 text-gray-800">$${parseFloat(transactionData.amount).toFixed(2)}</td>
+          <td class="py-3 px-2">
+            <span class="bg-${result.status === 'Safe' ? 'green' : 'red'}-100 text-${result.status === 'Safe' ? 'green' : 'red'}-800 text-xs font-medium px-2.5 py-0.5 rounded relative group cursor-help">
+              ${result.status}
+              <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 invisible group-hover:visible bg-gray-800 text-white text-xs p-2 rounded w-48 z-10">
+                ${tooltipContent}
+              </div>
+            </span>
+          </td>
+          <td class="py-3 px-2 text-gray-600">${getCurrentTimestamp()}</td>
+        `;
+        
+        if (tbody.querySelector('tr')) {
+          tbody.insertBefore(newRow, tbody.firstChild);
+        } else {
+          tbody.appendChild(newRow);
+        }
+        
+        // Show notification based on status with more details
+        if (result.status === 'Safe') {
+          showNotification(`Transaction verified as safe (Score: ${result.risk_score}%)`);
+        } else {
+          let warningMsg = `Potential fraud detected (Score: ${result.risk_score}%)`;
+          if (result.triggered_rules && result.triggered_rules.length > 0) {
+            warningMsg += `. Rules: ${result.triggered_rules.join(', ')}`;
+          }
+          showNotification(warningMsg, 'error');
+        }
+        
+        // Reset form
+        transactionAmount.value = '';
+        transactionDescription.value = '';
+        
+        
+        // Refresh statistics and transaction history from the server
+        fetchDashboardStatistics();
+        
+        // Force a delay before fetching transactions to give the server time to process
+        setTimeout(() => {
+          fetchTransactionHistory(); // This will fetch the latest transactions including our new one
+        }, 500);
+        
+      } catch (error) {
+        showNotification('Error processing transaction', 'error');
+      }
+    }, () => {
+      showNotification('Unable to access location', 'error');
+    });
+  } else {
+    showNotification('Geolocation is not supported by your browser', 'error');
+  }
+});
+
+denyLocationBtn.addEventListener('click', function() {
+  hideLocationDialog();
+  showNotification('Location access denied. Unable to verify transaction.', 'error');
+});
+
+// Filter buttons
+filterButtons.forEach(button => {
+  button.addEventListener('click', function() {
+    const filter = this.getAttribute('data-filter');
+    fetchTransactionHistory(filter);
+    
+    // Update active state
+    filterButtons.forEach(btn => {
+      btn.classList.remove('ring-2', 'ring-primary');
+    });
+    this.classList.add('ring-2', 'ring-primary');
+  });
+});
+
+// Export functionality
+exportBtn.addEventListener('click', () => {
+  exportDialog.classList.remove('hidden');
+  updatePreviewData();
+});
+
+function hideDialog() {
+  exportDialog.classList.add('hidden');
+}
+
+closeExportDialog.addEventListener('click', hideDialog);
+cancelExport.addEventListener('click', hideDialog);
+
+// Radio button styling
+document.querySelectorAll('input[type="radio"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    // Reset all
+    document.querySelectorAll('input[type="radio"] + div div').forEach(dot => {
+      dot.classList.add('hidden');
+    });
+    // Show selected
+    if (this.checked) {
+      this.nextElementSibling.querySelector('div').classList.remove('hidden');
+    }
+  });
+});
+
+// Initialize radio buttons
+document.querySelector('input[name="format"]:checked').nextElementSibling.querySelector('div').classList.remove('hidden');
+
+async function updatePreviewData() {
+  // Fetch a small sample for preview
+  try {
+    let url = `${API_BASE_URL}/api/transactions?limit=5`;
+    if (statusFilter.value !== 'all') {
+      url += `&status=${statusFilter.value.charAt(0).toUpperCase() + statusFilter.value.slice(1)}`;
+    }
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
+    const transactions = await response.json();
+    
+    previewData.innerHTML = transactions.map(tx => `
+      <tr class="border-b border-gray-100">
+        <td class="py-2 px-2 text-gray-800">${tx.transaction_id}</td>
+        <td class="py-2 px-2 text-gray-800">$${tx.amount.toFixed(2)}</td>
+        <td class="py-2 px-2">
+          <span class="bg-${tx.status === 'Safe' ? 'green' : 'red'}-100 text-${tx.status === 'Safe' ? 'green' : 'red'}-800 text-xs font-medium px-2.5 py-0.5 rounded">${tx.status}</span>
+        </td>
+        <td class="py-2 px-2 text-gray-600">${tx.timestamp.split(' ')[0]}</td>
+      </tr>
+    `).join('');
+    
+    if (transactions.length === 0) {
+      previewData.innerHTML = `
+        <tr class="border-b border-gray-100">
+          <td class="py-2 px-2 text-gray-800" colspan="4">No data matching your filters</td>
+        </tr>
+      `;
+    }
+    
+  } catch (error) {
+    console.error('Error fetching preview data:', error);
+    previewData.innerHTML = `
+      <tr class="border-b border-gray-100">
+        <td class="py-2 px-2 text-red-600" colspan="4">Error loading preview data</td>
+      </tr>
+    `;
+  }
+}
+
+// Handle status filter change for preview
+statusFilter.addEventListener('change', updatePreviewData);
+
+// Handle export
+confirmExport.addEventListener('click', async () => {
+  const format = document.querySelector('input[name="format"]:checked').value;
+  const exportData = {
+    format,
+    start_date: startDate.value,
+    end_date: endDate.value,
+    status: statusFilter.value
+  };
+  
+  try {
+    // Show export in progress message
+    showNotification(`Exporting data in ${format.toUpperCase()} format...`);
+    
+    await exportTransactions(exportData);
+    hideDialog();
+  } catch (error) {
+    showNotification('Error exporting data', 'error');
+  }
+});
+
+// Login and Registration
+const authContainer = document.getElementById('authContainer');
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+const loginButton = document.getElementById('loginButton');
+const registerButton = document.getElementById('registerButton');
+const showRegisterBtn = document.getElementById('showRegisterBtn');
+const showLoginBtn = document.getElementById('showLoginBtn');
+const loginError = document.getElementById('loginError');
+const registerError = document.getElementById('registerError');
+
+// Switch to register form
+showRegisterBtn.addEventListener('click', () => {
+  loginForm.classList.add('hidden');
+  registerForm.classList.remove('hidden');
+});
+
+// Switch to login form
+showLoginBtn.addEventListener('click', () => {
+  registerForm.classList.add('hidden');
+  loginForm.classList.remove('hidden');
+});
+
+// Login functionality
+loginButton.addEventListener('click', async () => {
+  const username = document.getElementById('loginUsername').value;
+  const password = document.getElementById('loginPassword').value;
+  
+  if (!username || !password) {
+    loginError.textContent = 'Please enter both username and password';
+    loginError.classList.remove('hidden');
+    return;
+  }
+  
+  loginError.classList.add('hidden');
+  try {
+    // OAuth2 requires form data, not JSON
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('password', password);
+    
+    const response = await fetch(`${API_BASE_URL}/token`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Login failed');
+    }
+    
+    const result = await response.json();
+    
+    // The token endpoint returns token data directly, not a success field
+    // Store the token and user information
+    localStorage.setItem('accessToken', result.access_token);
+    localStorage.setItem('userId', result.user_id);
+    localStorage.setItem('username', result.username);
+    
+    // Set user info and show dashboard
+    document.getElementById('profileUsername').textContent = result.username;
+    document.getElementById('profileUserId').textContent = `ID: ${result.user_id}`;
+    authContainer.classList.add('hidden');
+    document.getElementById('userProfileBar').classList.remove('hidden');
+    document.getElementById('mainDashboard').classList.remove('hidden');
+    
+    // Refresh data
+    fetchDashboardStatistics();
+    fetchTransactionHistory();
+    fetchRiskAnalysisData();
+    
+    showNotification('Login successful');
+  } catch (error) {
+    console.error('Error during login:', error);
+    loginError.textContent = error.message || 'An error occurred during login';
+    loginError.classList.remove('hidden');
+  }
+});
+
+// Registration functionality
+registerButton.addEventListener('click', async () => {
+  const username = document.getElementById('registerUsername').value;
+  const password = document.getElementById('registerPassword').value;
+  const email = document.getElementById('registerEmail').value;
+  
+  if (!username || !password) {
+    registerError.textContent = 'Username and password are required';
+    registerError.classList.remove('hidden');
+    return;
+  }
+  
+  registerError.classList.add('hidden');  
+  try {
+    const response = await fetch(`${API_BASE_URL}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        username, 
+        password, 
+        email, 
+        full_name: email ? email.split('@')[0] : username 
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Registration failed');
+    }
+    
+    const result = await response.json();
+    
+    showNotification('Registration successful. You can now log in.', 'success');
+    showLoginBtn.click();
+  } catch (error) {
+    console.error('Error during registration:', error);
+    registerError.textContent = 'An error occurred. Please try again later.';
+    registerError.classList.remove('hidden');
+  }
+});
+
+// Logout functionality
+document.getElementById('logoutButton').addEventListener('click', () => {
+  document.getElementById('userProfileBar').classList.add('hidden');
+  authContainer.classList.remove('hidden');
+  document.getElementById('mainDashboard').classList.add('hidden');
+  
+  showNotification('Logout successful');
+});
+
+// Authentication functions
+async function loginUser(username, password) {
+  try {
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('password', password);
+    
+    const response = await fetch(`${API_BASE_URL}/token`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Login failed');
+    }
+    
+    const tokenData = await response.json();
+    
+    // Save token in local storage
+    localStorage.setItem('accessToken', tokenData.access_token);
+    localStorage.setItem('userId', tokenData.user_id);
+    localStorage.setItem('username', tokenData.username);
+    
+    return tokenData;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+}
+
+async function getUserProfile() {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/users/me`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch user profile');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Get profile error:', error);
+    throw error;
+  }
+}
+
+// Add authorization header to all API calls
+async function fetchWithAuth(url, options = {}) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+  
+  const authOptions = {
+    ...options,
+    headers: {
+      ...options.headers,
+      'Authorization': `Bearer ${token}`
+    }
+  };
+  
+  return fetch(url, authOptions);
+}
+
+// Override the fetch functions to use authentication
+async function fetchDashboardStatistics() {
+  try {
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/statistics`);
+    const data = await response.json();
+    
+    document.getElementById('totalTransactions').textContent = data.total_transactions;
+    document.getElementById('fraudsDetected').textContent = data.frauds_detected;
+    document.getElementById('successRate').textContent = data.success_rate + '%';
+  } catch (error) {
+    console.error('Error fetching dashboard statistics:', error);
+    showNotification('Failed to load dashboard statistics', 'error');
+  }
+}
+
+async function fetchTransactionHistory(status = '') {
+  try {
+    let url = `${API_BASE_URL}/api/transactions?limit=10`;
+    if (status && status !== 'all') {
+      url += `&status=${status}`;
+    }
+    
+    // Use fetchWithAuth to ensure the token is included
+    const response = await fetchWithAuth(url);
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching transaction history: ${response.status}`);
+    }
+    
+    const transactions = await response.json();
+    console.log('API returned transactions:', transactions);
+    
+    if (!Array.isArray(transactions)) {
+      console.error('API did not return an array of transactions');
+      return [];
+    }
+    
+    // Update the table with the fetched data
+    updateTransactionsTable(transactions);
+    
+    // Save the transactions to local storage for offline access
+    saveTransactionsToCache(transactions);
+    
+    return transactions;
+  } catch (error) {
+    console.error('Error fetching transaction history:', error);
+    // If API call fails, try to use cached data as fallback
+    const cachedTransactions = loadTransactionsFromCache();
+    if (cachedTransactions && cachedTransactions.length > 0) {
+      showNotification('Using cached transaction data (offline mode)', 'error');
+      updateTransactionsTable(cachedTransactions);
+      return cachedTransactions;
+    }
+    return [];
+  }
+}
+
+// Application initialization
+async function initializeApp() {
+  // Check if user is logged in
+  const token = localStorage.getItem('accessToken');
+  const username = localStorage.getItem('username');
+  const userId = localStorage.getItem('userId');
+  
+  if (token && username && userId) {
+    try {
+      // Show user profile
+      document.getElementById('profileUsername').textContent = username;
+      document.getElementById('profileUserId').textContent = userId;
+      document.getElementById('userProfileBar').classList.remove('hidden');
+      document.getElementById('authContainer').classList.add('hidden');
+      document.getElementById('mainDashboard').classList.remove('hidden');
+      
+      // Load dashboard statistics
+      await fetchDashboardStatistics();
+      
+      // Load transaction history
+      await fetchTransactionHistory();
+      
+      // Load risk analysis data
+      await fetchRiskAnalysisData();
+    } catch (error) {
+      console.error('Error initializing app:', error);
+      // Token might be expired or invalid
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('username');
+      localStorage.removeItem('userId');
+    }
+  } else {
+    // Show login form
+    document.getElementById('authContainer').classList.remove('hidden');
+    document.getElementById('mainDashboard').classList.add('hidden');
+  }
+}
+
+// Refresh data periodically (every 30 seconds) if logged in
+setInterval(() => {
+  if (localStorage.getItem('accessToken')) {
+    fetchDashboardStatistics();
+    fetchTransactionHistory(); // Also refresh transaction history
+  }
+}, 30000);
+
+// Initialize the application when the page loads
+initializeApp();
+
+});
+</script>
+</body>
+</html>

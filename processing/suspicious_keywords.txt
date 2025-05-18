@@ -1,0 +1,38 @@
+# filepath: /home/arsh/Desktop/FraudDetection/processing/suspicious_keywords.txt
+bitcoin
+cryptocurrency
+crypto
+urgent transfer
+urgent payment
+western union
+money transfer
+wire transfer
+win lottery
+lottery winner
+nigerian prince
+investment opportunity
+high return
+get rich
+gift card
+itunes card
+steam card
+prepaid card
+verification code
+access code
+security code
+password reset
+account verify
+claim prize
+inheritance
+offshore
+money laundering
+tax refund
+tax return
+irs payment
+wire instructions
+bank details
+account change
+blackmail
+ransom
+darknet
+dark web
