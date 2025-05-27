@@ -48,7 +48,7 @@ def check_category_based_amount(amount: float | None, description: str) -> tuple
     if not config.USE_LLM_DETECTION or not config.GEMINI_API_KEY:
         return False, "LLM detection disabled"
     try:
-        time.sleep(3)
+        time.sleep(1)
         import google.generativeai as genai
         genai.configure(api_key=config.GEMINI_API_KEY)
         model = genai.GenerativeModel(config.GEMINI_MODEL)
@@ -200,7 +200,6 @@ def check_suspicious_description(description: str) -> bool:
                 keywords = [line.strip().lower() for line in f if line.strip()]
     except Exception as e:
         logger.error(f"Error loading suspicious keywords: {e}")
-        # Fallback to a short list of common suspicious terms
         keywords = ["bitcoin", "urgent", "money transfer", "gift card", "lottery"]
 
     # Check for suspicious keywords using Rabin-Karp

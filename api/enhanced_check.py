@@ -3,7 +3,7 @@ import hashlib
 import sys
 import os
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import mysql.connector
 
@@ -82,15 +82,22 @@ async def enhanced_check_transaction(transaction, logger, user_id=None):
         
         # 1. Apply basic rules
         triggered_rules = []
-        
+
         # Check for high amount
         if check_high_amount(transaction.amount):
             triggered_rules.append("high_amount")
-            
+
         # Check for suspicious description
         if transaction.description and check_suspicious_description(transaction.description):
             triggered_rules.append("suspicious_description")
-            
+
+        # --- CATEGORY-BASED AMOUNT CHECK (LLM/Gemini) ---
+        from processing.rule_engine import check_category_based_amount
+        is_cat_suspicious, cat_reason = check_category_based_amount(transaction.amount, transaction.description)
+        if is_cat_suspicious:
+            triggered_rules.append("category_amount")
+            processing_details["decision_factors"].append(f"Category-based amount: {cat_reason}")
+
         if triggered_rules:
             processing_details["methods_used"].append("rule_engine")
             processing_details["decision_factors"].append(f"Triggered rules: {', '.join(triggered_rules)}")
@@ -125,7 +132,7 @@ async def enhanced_check_transaction(transaction, logger, user_id=None):
                             # If we have a user ID, get their transaction history
                             if user_id:
                                 # Get transaction count for the last 24 hours
-                                time_window_start = current_time - datetime.timedelta(hours=24)
+                                time_window_start = current_time - timedelta(hours=24)
                                 ts_start_str = time_window_start.strftime("%Y-%m-%d %H:%M:%S")
                                 ts_end_str = current_time.strftime("%Y-%m-%d %H:%M:%S")
                                 
@@ -263,7 +270,7 @@ async def enhanced_check_transaction(transaction, logger, user_id=None):
                     tx["description"],
                     tx["location"],
                     tx["ip_address"],
-                    user_id  # Make sure user_id is used here and not hard-coded to something else
+                    user_id
                 )
             )
             
