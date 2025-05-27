@@ -19,6 +19,7 @@ python-multipart==0.0.20
 # ML and Data Processing
 scipy==1.15.3
 threadpoolctl==3.6.0
+google-generativeai==0.3.2
 
 # API and Web Server
 coloredlogs==15.0.1

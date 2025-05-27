@@ -10,14 +10,20 @@ This project implements a comprehensive fraud detection system with user authent
   - Machine learning models (ONNX format) for fraud prediction
 - **Interactive Dashboard**:
   - Real-time statistics on transactions and fraud attempts
-  - Transaction history with filtering capabilities
+  - Transaction history with filtering and status-based views
   - Risk analysis charts and visualizations
+  - Success rate and fraud prevention metrics
 - **Transaction Analysis**:
-  - Location verification for suspicious activity detection
+  - Location verification for suspicious activity detection (with geolocation dialog)
   - IP address tracking with privacy considerations
   - Description analysis for suspicious keywords
-- **Data Export**: Export transaction data in various formats (CSV, etc.)
+  - User-specific transaction pattern analysis
+- **Data Export**: Export transaction data in CSV, Excel, and PDF formats with date range and status filters
+- **Recent History**: View recent transactions with detailed tooltips (triggered rules, risk score, ML confidence)
+- **Session Management**: Persistent login, logout, and automatic dashboard refresh every 30 seconds
 - **API Documentation**: Comprehensive FastAPI documentation
+- **Frontend Enhancements**: Responsive UI, notification system, and local caching for transaction data
+- **LLM Integration (Gemini API)**: Optional integration with Google Gemini for advanced language-based fraud detection (requires `GEMINI_API_KEY` and `USE_LLM_DETECTION` in `.env`).
 
 ## How the System Works
 
@@ -130,6 +136,10 @@ pip install -r requirements-dev.txt
 # RULE_MAX_AMOUNT=1000.00
 # RULE_MAX_TRANSACTIONS_PER_HOUR=5
 # ML_SCORE_THRESHOLD=0.7
+#
+# # Optional - LLM Integration (Gemini API)
+# GEMINI_API_KEY=your_gemini_api_key   # Gemini API key for LLM integration
+# USE_LLM_DETECTION=true                 # Enable LLM-based detection (default: true)
 # --- end .env file ---
 
 # 4. Initialize the database
@@ -169,6 +179,18 @@ The system provides the following key API endpoints:
 ### System Endpoints
 - `GET /health` - Check system health (Redis, MySQL connections)
 - `GET /docs` - Interactive API documentation (Swagger UI)
+
+## Environment Variables
+
+The following environment variables are supported (see `.env`):
+- `GEMINI_API_KEY`: API key for Gemini LLM (optional, enables LLM-based detection)
+- `USE_LLM_DETECTION`: Set to `true` to enable LLM-based detection (default: true)
+- `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`, `REDIS_USERNAME`: Redis connection
+- `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`: MySQL connection
+- `ALERT_WEBHOOK_URL`: Webhook for fraud alerts (optional)
+- `JWT_SECRET_KEY`: Secret for JWT authentication
+- `MODEL_PATH`, `SCALER_PATH`: ML model/scaler paths (optional)
+- `RULE_MAX_AMOUNT`, `RULE_MAX_TRANSACTIONS_PER_HOUR`, `ML_SCORE_THRESHOLD`: Rule/ML config (optional)
 
 ## Security Considerations
 

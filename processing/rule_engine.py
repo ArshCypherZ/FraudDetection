@@ -4,6 +4,9 @@ import os
 from datetime import datetime, timedelta
 import redis
 import logging
+import json
+import asyncio
+from typing import Optional
 
 import config
 
@@ -28,6 +31,68 @@ def get_redis_connection():
 # Rabin-Karp Implementation Constants
 D_RK = 256  # Number of characters in the input alphabet (ASCII)
 Q_RK = 101  # A prime number for modulo operation
+
+
+def check_category_based_amount(amount: float | None, description: str) -> tuple[bool, str]:
+    """
+    Uses Gemini LLM to determine if the amount is unusually high for the given description.
+    Returns (is_suspicious, reason).
+    """
+    import time
+    import math
+    if amount is None or description is None or str(description).strip() == "":
+        return False, "No amount or description provided"
+    # Handle edge cases for amount
+    if not isinstance(amount, (int, float)) or math.isnan(amount) or math.isinf(amount) or amount < 0 or amount > 1e8:
+        return False, "Invalid or extreme amount value"
+    if not config.USE_LLM_DETECTION or not config.GEMINI_API_KEY:
+        return False, "LLM detection disabled"
+    try:
+        time.sleep(3)
+        import google.generativeai as genai
+        genai.configure(api_key=config.GEMINI_API_KEY)
+        model = genai.GenerativeModel(config.GEMINI_MODEL)
+        prompt = f"""You are an expert financial fraud detection system. Your job is to decide if a transaction amount is suspiciously high for the described purchase or service. Use your knowledge of typical prices and context. Be strict for obvious mismatches, but do NOT flag reasonable or common transactions as fraud. Only flag as suspicious if the amount is clearly excessive for the description.
+        Transaction Amount: {amount} USD
+        Description: {description}
+
+        IMPORTANT: Some items or services can be legitimately very expensive (e.g., high-end laptops, professional equipment, luxury goods, or business purchases). Do NOT flag these as suspicious if the amount is plausible for such cases, even if the number is high.
+
+        Instructions:
+        - If the amount is normal or plausible for the description, return is_suspicious: false.
+        - If the amount is clearly excessive or implausible for the description, return is_suspicious: true.
+        - If unsure, err on the side of not flagging as suspicious.
+
+        Respond in JSON:
+        {{
+        "is_suspicious": true/false,
+        "reason": "brief explanation"
+        }}"""
+
+        response = model.generate_content(prompt)
+        if not response or not response.text:
+            logger.error("LLM response is empty or invalid.")
+            return False, "LLM response error"
+        response_text = (response.text).replace("```json", "").replace("```", "").strip()
+        try:
+            result = json.loads(response_text)
+        except Exception:
+            # Try to extract JSON from text
+            import re
+            match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if match:
+                try:
+                    result = json.loads(match.group(0))
+                except Exception:
+                    logger.error(f"LLM response could not be parsed: {response_text}")
+                    return False, "LLM response parse error"
+            else:
+                logger.error(f"LLM response could not be parsed: {response_text}")
+                return False, "LLM response parse error"
+        return result.get('is_suspicious', False), result.get('reason', '')
+    except Exception as e:
+        logger.error(f"LLM category-based amount detection error: {e}")
+        return False, f"LLM error: {str(e)}"
 
 
 def search_rabin_karp(pattern: str, text: str) -> bool:
@@ -163,9 +228,14 @@ def apply_rules(processed_data: dict) -> list:
         ):
             triggered_rules.append("high_frequency")
 
-    # Non-Redis rules
-    if check_high_amount(processed_data.get("Transaction_Amount")):
-        triggered_rules.append("high_amount")
+
+    # Category-based amount check (smart fraud detection)
+    is_category_fraud, category_reason = check_category_based_amount(
+        processed_data.get("Transaction_Amount"), 
+        processed_data.get("description", "")
+    )
+    if is_category_fraud:
+        triggered_rules.append("category_based_fraud")
 
     if check_suspicious_description(processed_data.get("description")):
         triggered_rules.append("suspicious_description")

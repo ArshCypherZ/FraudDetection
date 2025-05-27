@@ -27,11 +27,16 @@ MODEL_PATH = os.getenv("MODEL_PATH", "ml/model.onnx")
 SCALER_PATH = os.getenv("SCALER_PATH", "ml/scaler.joblib")
 
 # Rule Engine Configuration
-RULE_MAX_AMOUNT = float(os.getenv("RULE_MAX_AMOUNT", 10000.00))
+RULE_MAX_AMOUNT = float(os.getenv("RULE_MAX_AMOUNT", 25000.00)) 
 RULE_MAX_TRANSACTIONS_PER_HOUR = int(os.getenv("RULE_MAX_TRANSACTIONS_PER_HOUR", 5))
 
 # Decision Engine Configuration
 ML_SCORE_THRESHOLD = float(os.getenv("ML_SCORE_THRESHOLD", 0.7))
+
+# Gemini LLM Configuration
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", None)
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+USE_LLM_DETECTION = os.getenv("USE_LLM_DETECTION", "true").lower() == "true"
 
 # --- Helper Functions ---
 
